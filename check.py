@@ -25,8 +25,8 @@ off   = {"Content-Type":"application/json","data":{"fn":"signIn","mtime":"D","ps
 
 def clock_in(state):
     res = requests.post(url, json = state)
-    with open('/home/kk/Desktop/LOGS/clock_in.txt', 'a') as file:
-        file.write(mode + '\t Execute at : '+ exe_time + '\n')
+    #with open('/home/kk/Desktop/LOGS/clock_in.txt', 'a') as file:
+        #file.write(mode + '\t Execute at : '+ exe_time + '\n')
     #return print(res.text)
 
 clock_in(check)
