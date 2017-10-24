@@ -35,7 +35,7 @@ def ip_send():
 
   server.quit()
 
-time.sleep(60)
+
 ip_send()
 time.sleep(60)
 ip_send()
