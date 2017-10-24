@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import smtplib, tome
+import smtplib, time
 from email.message import EmailMessage
 from subprocess import check_output
 def ip_send():
