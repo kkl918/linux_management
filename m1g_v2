@@ -1,0 +1,77 @@
+#!/usr/bin/python
+import os, shutil3, smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
+import datetime, time, pathlib, re, requests 
+from bs4 import BeautifulSoup
+from urllib.request import urlretrieve
+
+#-----------------------------------------------------------------------------
+
+data_path = r'/home/kk/Destop/DATA//'
+pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+
+url_rebt = 'http://192.168.10.1/submit.php'
+data     = 'REBOOT=TRUE'
+
+url  = 'http://192.168.10.1/record/'
+name = 'admin'
+pwd  = 'password'
+auth = HTTPBasicAuth(name,pwd)
+
+res = requests.get(url,auth=auth)
+soup = BeautifulSoup(res.text, 'lxml')
+dats = soup.select('a')
+
+#-----------------------------------------------------------------------------
+
+sender = 'kakinglin@gmail.com'
+receivers = 'kakinglin@gmail.com'  
+
+gmail_sender = 'kakinglin@gmail.com'
+gmail_passwd = 'bpvfswzcogzdvtil'
+
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.ehlo()
+server.starttls()
+server.login(gmail_sender, gmail_passwd)
+
+#標題、內文
+subject = 'title'
+content = 'content'
+
+#创建一个带附件的实例
+message = MIMEMultipart()
+message['From'] = Header("kk", 'utf-8')
+message['To'] =  Header("Roro", 'utf-8')
+message['Subject'] = Header(subject, 'utf-8')
+ 
+#邮件正文内容
+message.attach(MIMEText(content, 'plain', 'utf-8'))
+ 
+
+def m1g_getData():
+    for dat in range(1,len(dats)):
+        if dat in os.listdir(data_path):
+                pass
+            else:	
+                #shutil.copyfile(path+text, path2+text)
+                dat = dats[dat].text[1:]
+                print(url+dat,data_path+dat)
+                urlretrieve(url+dat, data_path+dat)
+                attach = MIMEText(open(data_path + dat, 'rb').read(), 'base64', 'utf-8')
+                attach["Content-Type"] = 'application/octet-stream'
+                attach["Content-Disposition"] = 'attachment; filename='+ filename
+                message.attach(attach)
+                try:
+                    server.sendmail(sender, receivers, message.as_string())
+                    print ("邮件发送成功")
+                except smtplib.SMTPException:
+                    print ("Error: 无法发送邮件")
+		
+def m1g_reboot():
+	requests.post(url_rebt, data = {'REBOOT':'TRUE'})
+
+
+m1g_getData()    
