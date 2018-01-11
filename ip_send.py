@@ -37,18 +37,5 @@ def ip_send():
 
 
 ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
-time.sleep(60)
-ip_send()
+
   
