@@ -1,84 +1,74 @@
 #!/usr/bin/python3
-import os, smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.header import Header
-import datetime, time, pathlib, re, requests 
+import os, smtplib, ftplib, datetime, time, pathlib, re, requests
 from bs4 import BeautifulSoup
 from urllib.request import urlretrieve
 from requests.auth import HTTPBasicAuth
-#-----------------------------------------------------------------------------
-#標題、內文
-subject = 'M1G test in NCKU'
-content = 'content'
+from ftplib import FTP
 
-data_path = r'/home/kk/Desktop/DATA/'
-pathlib.Path(data_path).mkdir(parents=True, exist_ok=True)
-#-----------------------------------------------------------------------------
+import linebot
+#-----------------------------------------------------------------------------------
 
-url_submit = 'http://192.168.10.1/submit.php'
-data     = 'REBOOT=TRUE'
+# 依次序為[主機IP,使用者帳號,使用者密碼,FTP伺服器檔案路徑(FTP須先建立資料夾)]
+ftp_ip  = '60.249.2.146'
+ftp_usr = 'TBYT00'
+ftp_pwd = 'TBYT0932867611'
+ftp_cwd = '/homes/m1g_test'
 
-url  = 'http://192.168.10.1/record/'
-name = 'admin'
-pwd  = 'password'
-auth = HTTPBasicAuth(name,pwd)
+# line機器人所要傳送的訊息
+line_msg = 'M1G get data'
 
-res = requests.get(url,auth=auth)
-soup = BeautifulSoup(res.text, 'lxml')
-dats = soup.select('a')
-
-#-----------------------------------------------------------------------------
-
-sender = 'kakinglin@gmail.com'
-receivers = 'survey0669@gmail.com'  
-
-gmail_sender = 'kakinglin@gmail.com'
-gmail_passwd = 'bpvfswzcogzdvtil'
-
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.ehlo()
-server.starttls()
-server.login(gmail_sender, gmail_passwd)
-
-#创建一个带附件的实例
-message = MIMEMultipart()
-message['From'] = Header("kk", 'utf-8')
-message['To'] =  Header("Chen", 'utf-8')
-message['Subject'] = Header(subject, 'utf-8')
- 
-#邮件正文内容
-message.attach(MIMEText(content, 'plain', 'utf-8'))
-#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 
 def m1g_getData():
+	nowtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    url_submit = 'http://192.168.10.1/submit.php'
+	url  = 'http://192.168.10.1/record/'
+	name = 'admin'
+	pwd  = 'password'
+	auth = HTTPBasicAuth(name,pwd)
+
+	res = requests.get(url,auth=auth)
+	soup = BeautifulSoup(res.text, 'lxml')
+	dats = soup.select('a')
 	for dat in range(1,len(dats)):
 		dat = dats[dat].text[1:]
 		if dat in os.listdir(data_path):
 			pass
 		else:
-			print(url+dat,data_path+dat)
+			print(url+dat,data_path+dat)	
 			urlretrieve(url+dat, data_path+dat)
-			attach = MIMEText(open(data_path + dat, 'rb').read(), 'base64', 'utf-8')
-			attach["Content-Type"] = 'application/octet-stream'
-			attach["Content-Disposition"] = 'attachment; filename='+ dat
-			message.attach(attach)
-			try:
-				server.sendmail(sender, receivers, message.as_string())
-				print ("邮件发送成功")
-			except smtplib.SMTPException:
-				print ("Error: 无法发送邮件")
-
+			print("Start transmission of FTP.")
+			ftp = FTP(ftp_ip)
+			ftp.login(ftp_usr, ftp_pwd)
+			ftp.cwd(ftp_cwd)
+			file_ = open('/home/kk/Desktop/DATA/'+ dat,'rb')
+			ftp.storbinary('STOR %s' % dat, file_)
+			ftp.quit() 
+			file_.close() 
+			print("File transfered" + nowtime)
+			
 def m1g_reboot():
 	requests.post(url_submit, data = {'REBOOT':'TRUE'})
 	
 def m1g_stop():
 	requests.post(url_submit, data = {'CMD':'DEVICE.RECORD.STOPRECORD'})
+
 def m1g_start():
 	requests.post(url_submit, data = {'CMD':'DEVICE.RECORD.STARTRECORD'})
+
 #-----------------------------------------------------------------------------
 
-m1g_getData()
-#m1g_stop()
-#time.sleep(1)
-m1g_start()
+if __name__ == '__main__':
+	line = linebot.bot.single_text(line_msg) # 不必改動也勿改動
+	
+	# 以下為程序運行順序，依次序由上至下
+	# -------------------------------------------------------
+	m1g_stop()      # M1G停止紀錄
+	#time.sleep(10) # 程序暫停10秒(可自定義秒數)	
+	m1g_getData()   # #M1G抓取資料到主機並推送自遠端FTP站台
+	m1g_start()     # M1G開始紀錄
+	line()          # line機器人傳送訊息
+	#mail_send()    # 寄送EMAIL(此版本無此功能，勿啟用會自造成錯誤)
+	#m1g_reboot()   # M1G重開機
+    # -------------------------------------------------------
+    # END
