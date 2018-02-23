@@ -56,6 +56,11 @@ def m1g_getData(ftp_server):
             file_.close() 
             print("File transfered " + nowtime)
 '''    
+def format_disk():
+    requests.post(url_submit, data = {'FORMAT':'DISk'})
+    print('[ Rormat ] M1G successed.')
+    line_msg.bot().send_text(msg2line + ' [ Rormat ] M1G successed.')
+
 def m1g_reboot():
     requests.post(url_submit, data = {'REBOOT':'TRUE'})
     print('Reboot M1G successed.')
@@ -202,6 +207,9 @@ if __name__ == '__main__':
             
         elif option =='gz':
             m1g_gz(data_path,data_gz_path)
+         
+        elif option =='format':
+            m1g_format()
             
         else:
             print('try : [--start] [--stop] [--reboot] [--get] [--ftp_unix] [--test] [--line]')
@@ -209,7 +217,6 @@ if __name__ == '__main__':
     else:
         print('wrong type argv')
         sys.exit()
-
     '''
     # 以下為程序運行順序，依次序由上至下
     # -------------------------------------------------------
