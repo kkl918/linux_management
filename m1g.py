@@ -15,12 +15,12 @@ pathlib.Path(data_path).mkdir(parents=True, exist_ok=True)
 pathlib.Path(data_gz_path).mkdir(parents=True, exist_ok=True)
 
 # 次序為[主機IP,使用者帳號,使用者密碼,FTP伺服器檔案路徑(FTP須先建立資料夾)]
-ftp_1 = ['140.116.89.125','azes','azes00','/m1g/test']
-ftp_2 = ['60.249.2.146','TBYT00','TBYT0932867611','/homes/m1g_test_gz']
+ftp_1 = ['140.116.89.125','azes','azes00','/azes_gz']
+ftp_2 = ['60.249.2.146','TBYT00','TBYT0932867611','/homes/azes_gz']
 
 
 # line要發送的訊息
-msg2line = 'M1G in NCKU :'
+msg2line = 'M1G in AZES :'
 
 
 #-----------------------------------------------------------------------------------
@@ -43,6 +43,7 @@ def m1g_getData(ftp_server):
         if dat in os.listdir(data_path):
             pass
         else:
+            print('Start to download data.')
             urlretrieve(url+dat, data_path+dat)
             print(url+dat,data_path+dat + ' -> getDATA successed.')
             line_msg.bot().send_text(msg2line + ' get data to pi successed.')
@@ -56,11 +57,6 @@ def m1g_getData(ftp_server):
             file_.close() 
             print("File transfered " + nowtime)
 '''    
-def format_disk():
-    requests.post(url_submit, data = {'FORMAT':'DISk'})
-    print('[ Rormat ] M1G successed.')
-    line_msg.bot().send_text(msg2line + ' [ Rormat ] M1G successed.')
-
 def m1g_reboot():
     requests.post(url_submit, data = {'REBOOT':'TRUE'})
     print('Reboot M1G successed.')
@@ -78,8 +74,9 @@ def m1g_start():
 
 def m1g_gz(src_path,dst_path):
     for file in os.listdir(src_path):
-        print('Start compres file : ' + file)
-        with open(src_path + file, 'rb') as f_in, gzip.open(dst_path + file + '.gz', 'wb') as f_out:
+        if file + '.gz' not in os.listdir(dst_path):
+            print('Start compres file : ' + file)
+            with open(src_path + file, 'rb') as f_in, gzip.open(dst_path + file + '.gz', 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
 # for 陳南安 FTP
@@ -105,7 +102,7 @@ def m1g_ftp_unix(info, src_path):
             try:
                 ftp.storbinary('STOR %s' % dat , file2ftp)
                 print('Finish  transmission at ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                #line_msg.bot().send_text(msg2line + ' sync M1G and FTP successed.')
+                line_msg.bot().send_text(msg2line + ' sync M1G and FTP successed.')
             except:
                 print('Transmission error.')
                 line_msg.bot().send_text(msg2line + ' sync error.')
@@ -130,7 +127,7 @@ def m1g_ftp_win(info, src_path):
             pass
         else:
             print('Start   transmission for : '+ dat)
-            file2ftp = open(data_path + dat,'rb')
+            file2ftp = open(src_path + dat,'rb')
             try:
                   ftp.storbinary('STOR %s' % dat, file2ftp)
                   print('Finish  transmission at ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -153,18 +150,48 @@ def m1g_test():
 
     res = requests.get(url_down,auth=auth)
     soup = BeautifulSoup(res.text, 'lxml')
-    print(soup)
-
-    dats = soup.select('.tr')
-    #dtts = soup.select('tr')
-    for dat in dats:
-        print(dat)
-    '''
-    for dat in range(1,len(dats)):
-        dat = dats[dat].text[1:]
-        print(dat)
-    line_msg.bot().send_text(msg2line + ' TEST M1G successed.')
-'''
+    file_info = {}
+    dats = soup.select('tr')
+    for i in range(len(dats)):
+        last_file = dats[len(dats)-1].text[:12]
+    for dat in dats[1:]:
+        for i in range(len(dat.text)-12):
+            num = 0
+            if dat.text[12+i] == 'M':
+                file_info[dat.text[:12]] = dat.text[12:13+i]
+            elif dat.text[12+i] == 'K':
+                file_info[dat.text[:12]] = dat.text[12:13+i]
+            elif dat.text[12+i] == 'B':
+                file_info[dat.text[:12]] = dat.text[12:13+i]
+            else:
+                print('Test error.')
+    for key in file_info.keys():
+        print(key, file_info[key])
+    
+    size1 = file_info[last_file]
+    print('Last file is : ' + last_file + ' ' +file_info[last_file])
+    line_msg.bot().send_text(msg2line + 'Last file is : ' + last_file + ' ' +file_info[last_file])
+    
+    time.sleep(5)
+    
+    res = requests.get(url_down,auth=auth)
+    soup = BeautifulSoup(res.text, 'lxml')
+    dats = soup.select('tr')
+    for i in range(len(dats)):
+        last_file = dats[len(dats)-1].text[:12]
+    for dat in dats[1:]:
+        for i in range(len(dat.text)-12):
+            num = 0
+            if dat.text[12+i] == 'M':
+                file_info[dat.text[:12]] = dat.text[12:13+i]
+            elif dat.text[12+i] == 'K':
+                file_info[dat.text[:12]] = dat.text[12:13+i]
+    size2 = file_info[last_file]
+    print('After 5 seconds : ' + last_file + ' ' +file_info[last_file])
+    line_msg.bot().send_text(msg2line + 'After 5 seconds : ' + last_file + ' ' +file_info[last_file])
+    if size2[:-1] > size1[:-1]:
+        print('M1G is working well.' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        line_msg.bot().send_text(msg2line + 'M1G is working well.' + ' ' +datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
 def m1g_line():
     # line機器人所要傳送的訊息
@@ -195,9 +222,9 @@ if __name__ == '__main__':
             
         elif option == 'ftp_unix':
             m1g_ftp_unix(ftp_2, data_gz_path)
-
+            
         elif option == 'ftp_win':
-            m1g_ftp_win(ftp_1, data_path)
+            m1g_ftp_win(ftp_1, data_gz_path)
             
         elif option == 'test':
             m1g_test()
@@ -207,9 +234,6 @@ if __name__ == '__main__':
             
         elif option =='gz':
             m1g_gz(data_path,data_gz_path)
-         
-        elif option =='format':
-            m1g_format()
             
         else:
             print('try : [--start] [--stop] [--reboot] [--get] [--ftp_unix] [--test] [--line]')
@@ -217,6 +241,7 @@ if __name__ == '__main__':
     else:
         print('wrong type argv')
         sys.exit()
+
     '''
     # 以下為程序運行順序，依次序由上至下
     # -------------------------------------------------------
