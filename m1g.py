@@ -72,6 +72,11 @@ def m1g_start():
     print('Start M1G successed.' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '\n')
     line_msg.bot().send_text(msg2line + ' Start M1G successed.')
 
+def m1g_format():
+    requests.post(url_submit, data = {'FORMAT':'DISK'})
+    print('[ FORMAT ] M1G successed.' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '\n')
+    line_msg.bot().send_text(msg2line + '[ 格式化 ] M1G successed.')
+
 def m1g_gz(src_path,dst_path):
     for file in os.listdir(src_path):
         if file + '.gz' not in os.listdir(dst_path):
@@ -164,7 +169,7 @@ def m1g_test():
             elif dat.text[12+i] == 'B':
                 file_info[dat.text[:12]] = dat.text[12:13+i]
             else:
-                print('Test error.')
+                pass
     for key in file_info.keys():
         print(key, file_info[key])
     
@@ -192,6 +197,9 @@ def m1g_test():
     if size2[:-1] > size1[:-1]:
         print('M1G is working well.' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         line_msg.bot().send_text(msg2line + 'M1G is working well.' + ' ' +datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    else:
+        print('M1G 罷工了，檢查一下!' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        line_msg.bot().send_text(msg2line + 'M1G 罷工了，檢查一下!' + ' ' +datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
 def m1g_line():
     # line機器人所要傳送的訊息
@@ -232,6 +240,9 @@ if __name__ == '__main__':
         elif option == 'line':
             m1g_line()
             
+        elif option == 'format':
+            m1g_format()
+        
         elif option =='gz':
             m1g_gz(data_path,data_gz_path)
             
