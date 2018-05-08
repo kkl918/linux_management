@@ -4,6 +4,9 @@ sudo apt-get install git -y
 sudo apt-get install python-matplotlib -y
 sudo apt install python-pip -y
 pip3 install -r ./basic.txt
+git clone https://github.com/ArduPilot/ardupilot.git
+sudo usermod -a -G dialout kk
+~/ardupilot/Tools/scripts/install-prereqs-ubuntu.sh -y
 
 #　Pymavlink
 sudo apt-get install libxml2-dev libxslt-dev python-dev
