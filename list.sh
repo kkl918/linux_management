@@ -2,7 +2,13 @@ sudo apt-get install vim -y
 sudo apt-get install python3-pip -y
 sudo apt-get install git -y
 sudo apt-get install python-matplotlib -y
+sudo apt install python-pip -y
 
+#　Pymavlink
+
+sudo apt-get install libxml2-dev libxslt-dev python-dev
+sudo pip2 install -U future lxml
+sudo pip2 install -U pymavlink
 
 # gcc -------------------------------------
 
