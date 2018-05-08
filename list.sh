@@ -3,6 +3,7 @@ sudo apt-get install python3-pip -y
 sudo apt-get install git -y
 sudo apt-get install python-matplotlib -y
 sudo apt install python-pip -y
+pip3 install -r ./basic.txt
 
 #　Pymavlink
 sudo apt-get install libxml2-dev libxslt-dev python-dev
