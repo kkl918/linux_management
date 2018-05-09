@@ -24,3 +24,5 @@ scipy
 six
 toml
 wxPython
+manpages-pl 
+manpages-fr-extra
