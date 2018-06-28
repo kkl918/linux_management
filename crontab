@@ -4,3 +4,11 @@
 10 08 * * * /usr/bin/python3.5 /home/kk/Desktop/setup/m1g.py --gz  >> /home/kk/Desktop/data.log 2>&1
 20 08 * * * /usr/bin/python3.5 /home/kk/Desktop/setup/m1g.py --ftp_unix  >> /home/kk/Desktop/data.log 2>&1
 30 08 * * * /usr/bin/python3.5 /home/kk/Desktop/setup/m1g.py --ftp_win  >> /home/kk/Desktop/data.log 2>&1
+
+59 07 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --stop  >> /home/pi/Desktop/data.log 2>&1
+00 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --start >> /home/pi/Desktop/data.log 2>&1
+01 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --get >> /home/pi/Desktop/data.log 2>&1
+10 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --gz  >> /home/pi/Desktop/data.log 2>&1
+20 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --ftp_unix  >> /home/pi/Desktop/data.log 2>&1
+30 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --ftp_win  >> /home/pi/Desktop/data.log 2>&1
+40 08 * * * /usr/bin/python3.5 /home/pi/setup/m1g.py --test  >> /home/pi/Desktop/data.log 2>&1
