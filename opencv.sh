@@ -28,3 +28,6 @@ cmake -D CMAKE_BUILD_TYPE=Release \
 -D BUILD_EXAMPLES=OFF ..
 
 make -j4
+
+sudo make install
+sudo ldconfig
