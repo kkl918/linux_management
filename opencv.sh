@@ -9,6 +9,9 @@ sudo apt-get install libgtk2.0-dev -y
 sudo apt-get install libatlas-base-dev gfortran -y
 sudo apt-get install python-dev python3-dev -y
 sudo apt-get install python-pip python3-pip -y
+sudo apt-get install -y python-setuptools
+sudo apt-get install -y python3-setuptools
+
 pip install numpy
 pip3 install numpy
 git clone https://github.com/opencv/opencv.git
