@@ -11,7 +11,6 @@ sudo apt-get install python-dev python3-dev -y
 sudo apt-get install python-pip python3-pip -y
 pip install numpy
 pip3 install numpy
-sudo apt-get install git  -y
 git clone https://github.com/opencv/opencv.git
 git clone https://github.com/opencv/opencv_contrib.git
 cd opencv
