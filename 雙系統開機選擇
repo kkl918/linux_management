@@ -1,0 +1,2 @@
+sudo gedit /etc/default/grub -> 留 quite就好
+sudo update-grub2
